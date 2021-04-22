@@ -1,0 +1,321 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Message that will be displayed on users first issue'
+        pr-message: 'Message that will be displayed on users first pull request'
+- name: Go Formatter
+  # You may pin to the exact commit or the version.
+  # uses: sladyn98/auto-go-format@6557e892479fd174506c48cb34017c51399d492b
+  uses: sladyn98/auto-go-format@v0.0.1
+  - name: UI-licious Test Runner
+  # You may pin to the exact commit or the version.
+  # uses: omairvaiyani/ghact-uilicious@ab48d2a67d063c48cfeda158f57398f9e8f6f4d9
+  uses: omairvaiyani/ghact-uilicious@v1.1.0
+  with:
+    # Your project API access key.
+    access-key: # optional
+    # Your UI-licious project name.
+    project: 
+    # Comma-separated list of tests to run. Also see 'pattern' for advanced usage.
+    tests: # optional
+    # If 'true', the 'tests' input will be treated as a glob pattern. Defaults to 'false'.
+    pattern: # optional
+    # Select which browser to run the test(s) in. Defaults to your project's settings.
+    browser: # optional
+    # Choose a dataset.
+    dataset: # optional
+    # If 'false', the action will not be marked as failed even if tests fail. Defaults to 'true'.
+    blow-up: # optional
+    # If 'true', info logs will be printed including test run messages from UI-licious. Defaults to 'false'.
+    verbose: # optional
+    - name: Install Pulumi CLI
+  # You may pin to the exact commit or the version.
+  # uses: pulumi/action-install-pulumi-cli@284f1767c0d25c619acf0f246ba633beb078b651
+  uses: pulumi/action-install-pulumi-cli@v1.0.2
+  with:
+    # Version of the Pulumi CLI to install, or 'latest' (default).
+    pulumi-version: # optional, default is latest
+    - name: Setup Python
+  uses: actions/setup-python@v2.2.2
+  with:
+    # Version range or exact version of a Python version to use, using SemVer's version range syntax.
+    python-version: # optional, default is 3.x
+    # The target architecture (x86, x64) of the Python interpreter.
+    architecture: # optional
+    # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
+    token: # optional, default is ${{ github.token }}
+    - name: Run Parasoft C/C++test
+  # You may pin to the exact commit or the version.
+  # uses: parasoft/run-cpptest-action@104f1c9cf6dbfd4b22e248a41d2e5a1e25e68b9e
+  uses: parasoft/run-cpptest-action@1.0.0
+  with:
+    # Installation folder of Parasoft C/C++test. If not specified, the cpptestcli executable must be added to $PATH.
+    installDir: # optional
+    # Working directory for running C/C++test.
+    workingDir: # optional, default is ${{ github.workspace }}
+    # Identifier of a compiler configuration. Ensure you specify the configuration that matches your compiler.
+    compilerConfig: # optional, default is gcc_9-64
+    # Test configuration to be used for code analysis.
+    testConfig: # optional, default is builtin://Recommended Rules
+    # Output folder for reports from code analysis.
+    reportDir: # optional, default is reports
+    # Format of reports from code analysis.
+    reportFormat: # optional, default is xml,html,sarif
+    # Input scope for analysis (typically, cpptestscan.bdf or compile_commands.json, depending on the project type and the build system).
+    input: # optional, default is cpptestscan.bdf
+    # Additional parameters for the cpptestcli executable.
+    additionalParams: # optional, default is 
+    # Command line pattern for running C/C++test.
+    commandLinePattern: # optional, default is ${cpptestcli} -compiler "${compilerConfig}" -config "${testConfig}" -property report.format=${reportFormat} -report "${reportDir}" -module . -input "${input}" ${additionalParams}
+    - name: Run Parasoft Jtest
+  # You may pin to the exact commit or the version.
+  # uses: parasoft/run-jtest-action@8883f9f725f0b161ceb49364714a3f8d15502587
+  uses: parasoft/run-jtest-action@0.0.2
+  with:
+    # Installation folder of Parasoft Jtest. If not specified, the cpptestcli executable must be added to PATH.
+    installDir: # optional
+    # Working directory for running Jtest.
+    workingDir: # optional, default is ${{ github.workspace }}
+    # Test configuration to be used for code analysis.
+    testConfig: # optional, default is builtin://Recommended Rules
+    # Output folder for reports from code analysis.
+    reportDir: # optional, default is reports
+    # Format of reports from code analysis.
+    reportFormat: # optional, default is xml,html,sarif
+    # Input scope for analysis.
+    input: # optional, default is jtest.data.json
+    # Additional parameters for the jtestcli executable.
+    additionalParams: # optional, default is 
+    - name: Deploy to Cloud Run
+  uses: google-github-actions/deploy-cloudrun@v0.3.0
+- name: Docker Setup Buildx
+  # You may pin to the exact commit or the version.
+  # uses: docker/setup-buildx-action@2a4b53665e15ce7d7049afb11ff1f70ff1610609
+  uses: docker/setup-buildx-action@v1.1.2
+  with:
+    # Buildx version. (eg. v0.3.0)
+    version: # optional
+    # Sets the builder driver to be used
+    driver: # optional, default is docker-container
+    # List of additional driver-specific options. (eg. image=moby/buildkit:master)
+    driver-opts: # optional
+    # Flags for buildkitd daemon
+    buildkitd-flags: # optional, default is --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
+    # Sets up docker build command as an alias to docker buildx
+    install: # optional, default is false
+    # Switch to this builder instance
+    use: # optional, default is true
+    # Optional address for docker socket or context from `docker context ls`
+    endpoint: # optional
+    - name: Push Package to Octopus Deploy
+  uses: OctopusDeploy/push-package-action@v1.0.0
+- name: Close Stale Issues
+  uses: actions/stale@v3.0.18
+  with:
+    # Token for the repository. Can be passed in using `{{ secrets.GITHUB_TOKEN }}`.
+    repo-token: # optional, default is ${{ github.token }}
+    # The message to post on the issue when tagging it. If none provided, will not mark issues stale.
+    stale-issue-message: # optional
+    # The message to post on the pull request when tagging it. If none provided, will not mark pull requests stale.
+    stale-pr-message: # optional
+    # The message to post on the issue when closing it. If none provided, will not comment when closing an issue.
+    close-issue-message: # optional
+    # The message to post on the pull request when closing it. If none provided, will not comment when closing a pull requests.
+    close-pr-message: # optional
+    # The number of days old an issue or a pull request can be before marking it stale. Set to -1 to never mark issues or pull requests as stale automatically.
+    days-before-stale: # optional, default is 60
+    # The number of days old an issue can be before marking it stale. Set to -1 to never mark issues as stale automatically. Override "days-before-stale" option regarding only the issues.
+    days-before-issue-stale: # optional
+    # The number of days old a pull request can be before marking it stale. Set to -1 to never mark pull requests as stale automatically. Override "days-before-stale" option regarding only the pull requests.
+    days-before-pr-stale: # optional
+    # The number of days to wait to close an issue or a pull request after it being marked stale. Set to -1 to never close stale issues or pull requests.
+    days-before-close: # optional, default is 7
+    # The number of days to wait to close an issue after it being marked stale. Set to -1 to never close stale issues. Override "days-before-close" option regarding only the issues.
+    days-before-issue-close: # optional
+    # The number of days to wait to close a pull request after it being marked stale. Set to -1 to never close stale pull requests. Override "days-before-close" option regarding only the pull requests.
+    days-before-pr-close: # optional
+    # The label to apply when an issue is stale.
+    stale-issue-label: # optional, default is Stale
+    # The label to apply when an issue is closed.
+    close-issue-label: # optional
+    # The labels that mean an issue is exempt from being marked stale. Separate multiple labels with commas (eg. "label1,label2").
+    exempt-issue-labels: # optional, default is 
+    # The label to apply when a pull request is stale.
+    stale-pr-label: # optional, default is Stale
+    # The label to apply when a pull request is closed.
+    close-pr-label: # optional
+    # The labels that mean a pull request is exempt from being marked as stale. Separate multiple labels with commas (eg. "label1,label2").
+    exempt-pr-labels: # optional, default is 
+    # The milestones that mean an issue or a pull request is exempt from being marked as stale. Separate multiple milestones with commas (eg. "milestone1,milestone2").
+    exempt-milestones: # optional, default is 
+    # The milestones that mean an issue is exempt from being marked as stale. Separate multiple milestones with commas (eg. "milestone1,milestone2"). Override "exempt-milestones" option regarding only the issues.
+    exempt-issue-milestones: # optional, default is 
+    # The milestones that mean a pull request is exempt from being marked as stale. Separate multiple milestones with commas (eg. "milestone1,milestone2"). Override "exempt-milestones" option regarding only the pull requests.
+    exempt-pr-milestones: # optional, default is 
+    # Exempt all issues and pull requests with milestones from being marked as stale. Default to false.
+    exempt-all-milestones: # optional, default is false
+    # Exempt all issues with milestones from being marked as stale. Override "exempt-all-milestones" option regarding only the issues.
+    exempt-all-issue-milestones: # optional, default is 
+    # Exempt all pull requests with milestones from being marked as stale. Override "exempt-all-milestones" option regarding only the pull requests.
+    exempt-all-pr-milestones: # optional, default is 
+    # Only issues or pull requests with all of these labels are checked if stale. Defaults to `` (disabled) and can be a comma-separated list of labels.
+    only-labels: # optional, default is 
+    # Only issues or pull requests with at least one of these labels are checked if stale. Defaults to `` (disabled) and can be a comma-separated list of labels.
+    any-of-labels: # optional, default is 
+    # Only issues with all of these labels are checked if stale. Defaults to `[]` (disabled) and can be a comma-separated list of labels. Override "only-labels" option regarding only the issues.
+    only-issue-labels: # optional, default is 
+    # Only pull requests with all of these labels are checked if stale. Defaults to `[]` (disabled) and can be a comma-separated list of labels. Override "only-labels" option regarding only the pull requests.
+    only-pr-labels: # optional, default is 
+    # The maximum number of operations per run, used to control rate limiting (GitHub API CRUD related).
+    operations-per-run: # optional, default is 30
+    # Remove stale labels from issues when they are updated or commented on.
+    remove-stale-when-updated: # optional, default is true
+    # Run the processor in debug mode without actually performing any operations on live issues.
+    debug-only: # optional, default is false
+    # The order to get issues or pull requests. Defaults to false, which is descending.
+    ascending: # optional, default is false
+    # Skip adding stale message when marking a pull request as stale.
+    skip-stale-pr-message: # optional, default is false
+    # Skip adding stale message when marking an issue as stale.
+    skip-stale-issue-message: # optional, default is false
+    # Delete the git branch after closing a stale pull request.
+    delete-branch: # optional, default is false
+    # The date used to skip the stale action on issue/pull request created before it (ISO 8601 or RFC 2822).
+    start-date: # optional, default is 
+    # The assignees which exempt an issue or a pull request from being marked as stale. Separate multiple assignees with commas (eg. "user1,user2").
+    exempt-assignees: # optional, default is 
+    # The assignees which exempt an issue from being marked as stale. Separate multiple assignees with commas (eg. "user1,user2"). Override "exempt-assignees" option regarding only the issues.
+    exempt-issue-assignees: # optional, default is 
+    # The assignees which exempt a pull request from being marked as stale. Separate multiple assignees with commas (eg. "user1,user2"). Override "exempt-assignees" option regarding only the pull requests.
+    exempt-pr-assignees: # optional, default is 
+    # Exempt all issues and pull requests with assignees from being marked as stale. Default to false.
+    exempt-all-assignees: # optional, default is false
+    # Exempt all issues with assignees from being marked as stale. Override "exempt-all-assignees" option regarding only the issues.
+    exempt-all-issue-assignees: # optional, default is 
+    # Exempt all pull requests with assignees from being marked as stale. Override "exempt-all-assignees" option regarding only the pull requests.
+    exempt-all-pr-assignees: # optional, default is 
+    # Display some statistics at the end regarding the stale workflow (only when the logs are enabled).
+    enable-statistics: # optional, default is true
+    - name: Checkmarx CxFlow Action
+  # You may pin to the exact commit or the version.
+  # uses: checkmarx-ts/checkmarx-cxflow-github-action@fe2a395cbbee31268470d92b6c53ebc483005f0f
+  uses: checkmarx-ts/checkmarx-cxflow-github-action@v1.1
+  with:
+    # Provide Checkmarx URL
+    checkmarx_url: # default is 
+    # Select a Checkmarx Team
+    team: # default is /CxServer/SP/Company
+    # Provide Checkmarx Username
+    checkmarx_username: # default is 
+    # Provide Checkmarx Password
+    checkmarx_password: # default is 
+    # Provide Checkmarx Client Secret
+    checkmarx_client_secret: # default is 
+    # Select a Checkmarx Project
+    project: # default is 
+    # Select an Application Name used by downstream bug tracker systems
+    app: # optional, default is SampleApp
+    # Select a Checkmarx Preset
+    preset: # optional, default is Checkmarx Default
+    # Break build based on Checkmarx findings?
+    break_build: # optional
+    # Bug tracker for the scan results.
+    bug_tracker: # optional, default is Sarif
+    # Incremental Scans?
+    incremental: # optional, default is true
+    # Additional CLI parameters
+    params: # optional, default is 
+    # GitHub API Token
+    github_token: # optional, default is ${{ github.token }}
+    # Vulnerability Scanners (sast, sca, ast, cxgo)
+    scanners: # default is 
+    # Provide SCA API URL
+    sca_api_url: # optional, default is https://api.scacheckmarx.com
+    # Provide SCA APP URL
+    sca_app_url: # optional, default is https://sca.scacheckmarx.com
+    # Provide SCA Access Control URL
+    sca_access_control_url: # optional, default is https://platform.checkmarx.net
+    # Provide SCA Tenant
+    sca_tenant: # optional, default is 
+    # Provide SCA Username
+    sca_username: # optional, default is 
+    # Provide SCA Password
+    sca_password: # optional, default is 
+    # Provide CxGo Client Secret
+    cxgo_client_secret: # optional, default is 
+    # Provide CxGo API URL
+    cxgo_base_url: # optional, default is https://api.checkmarx.net
+    # Provide CxGo Portal URL
+    cxgo_portal_url: # optional, default is https://cloud.checkmarx.net
+    # Provide AST API URL
+    ast_api_url: # optional, default is 
+    # Provide AST WebApp URL
+    ast_webapp_url: # optional, default is 
+    # Provide AST Client ID
+    ast_client_id: # optional, default is 
+    # Provide AST Client Secret
+    ast_client_secret: # optional, default is 
+    - name: Lightstep Pre-Deploy Check
+  # You may pin to the exact commit or the version.
+  # uses: lightstep/lightstep-action-predeploy@22bec553a6d0fb3de5026acb1159085601f76408
+  uses: lightstep/lightstep-action-predeploy@v0.2.6
+  with:
+    # The organization associated with your Lightstep account (usually your company name)
+    lightstep_organization: # optional
+    # The Lightstep project associated with this repository
+    lightstep_project: # optional
+    # The key to access the Lightstep Public API
+    lightstep_api_key: # optional
+    # The token to access the Rollbar API
+    rollbar_api_token: # optional
+    # The token to access the PagerDuty API
+    pagerduty_api_token: # optional
+    # If set to true, collapse all conditions to a single table row
+    rollup_conditions: # optional
+    # If set to true, will not add a comment to pull-requests
+    disable_comment: # optional
+    - name: Action GitHub Deployment
+  uses: ReasonSoftware/action-github-deployment@v1.0.0
+- name: Setup Serverless environment
+  uses: Teakowa/setup-serverless@v1.1.1
+- name: Package Latest Version
+  uses: Bruce17/ghaction-package-latest-version@v1.1.0
+- name: Setup .NET Core SDK
+  uses: actions/setup-dotnet@v1.7.2
+  with:
+    # SDK version to use. Examples: 2.2.104, 3.1, 3.1.x
+    dotnet-version: # optional
+    # Optional package source for which to set up authentication. Will consult any existing NuGet.config in the root of the repo and provide a temporary NuGet.config using the NUGET_AUTH_TOKEN environment variable as a ClearTextPassword
+    source-url: # optional
+    # Optional OWNER for using packages from GitHub Package Registry organizations/users other than the current repository's owner. Only used if a GPR URL is also provided in source-url
+    owner: # optional
+    # Optional NuGet.config location, if your NuGet.config isn't located in the root of the repo.
+    config-file: # optional
+    - name: First interaction
+  uses: actions/first-interaction@v1.1.0
+  with:
+    # Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}
+    repo-token: 
+    # Comment to post on an individual's first issue
+    issue-message: # optional
+    # Comment to post on an individual's first pull request
+    pr-message: # optional
+    - name: Verify commit
+  # You may pin to the exact commit or the version.
+  # uses: vchain-us/verify-action@90b83be30ad0c876e8c2cf9870018a64e2c6237e
+  uses: vchain-us/verify-action@v0.1.0
+  with:
+    # List of SignerID(s) (separated by space) to authenticate against
+    signerID: # optional
+    # Organization's ID to authenticate against
+    org: # optional
+    # Default to the current directory
+    path: # optional, default is .
